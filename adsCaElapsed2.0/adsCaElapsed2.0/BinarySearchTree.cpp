@@ -3,6 +3,7 @@
 #include <string>
 #include "City.h"
 #include "TreeNode.h"
+#include "timer.h"
 using namespace std;
 //MAIN AT BOTTOM OF THIS FILE
 
@@ -17,21 +18,23 @@ public:
 	void display();
 	bool isEmpty();
 	int height();
-	void Inorder(TreeNode*);
-	void Postorder(TreeNode*);
-	void Preorder(TreeNode* node);
+	void Inorder( string n);
+	void Postorder( string n);
+	void Preorder(string n);
 	bool searchName(string name);
 	bool searchCoord(double lon,double lat);
 private:
 	TreeNode * root;
 	void insertPrivate(TreeNode *newNode, TreeNode *curr);//private insert method to allow for recursion
 	void displayPrivate(TreeNode *newNode);
+	int getHeight(TreeNode* node);
 	TreeNode* findSmallestPrivate(TreeNode *newNode);
 	void deleteCityPrivate(string name, TreeNode *&node);//delete city method allowing access to root
 	void Remove(TreeNode *&nodeToDel);
 	bool searchNamePrivate(TreeNode *root, string name);
 	bool searchCoordPrivate(TreeNode *node, double lon, double lat);
-
+	void printkdistanceNodeDown(TreeNode *root, int k);
+	int printkdistanceNode(TreeNode* root, TreeNode* target, int k);
 };
 
 BST::BST()
@@ -193,34 +196,35 @@ void BST::Remove(TreeNode *&node)//prepares the node for deletion
 }
 //----------------------------TRAVERSALS-------------------------------------------------------
 
-void BST::Preorder(TreeNode* node)
+void BST::Preorder(string n)
 {
-	if (node)
+	TreeNode *node = root;
+	if (node->city.getName() == n)
 	{
 		cout << node->city.getName() << " ";
-		Preorder(node->left);
-		Preorder(node->right);
+		Preorder(node->left->city.getName());
+		Preorder(node->right->city.getName());
 	}
 }
 
-void BST::Inorder(TreeNode* root)
+void BST::Inorder(string n)
 {
 	if (root != NULL)
 	{
-		Inorder(root->left);
+		Inorder(root->left->city.getName());
 		cout << root->city.getName() << endl;
-		Inorder(root->right);
+		Inorder(root->right->city.getName());
 
 	}
 }
 
-void BST::Postorder(TreeNode* root)
+void BST::Postorder( string n)
 {
 	if (root != NULL)
 	{
 
-		Postorder(root->left);
-		Postorder(root->right);
+		Postorder(root->left->city.getName());
+		Postorder(root->right->city.getName());
 		cout << root->city.getName() << endl;
 
 	}
@@ -255,7 +259,7 @@ bool BST::searchName(string name)
 {
 	return searchNamePrivate(root, name);
 }
-
+/*
 bool BST::searchCoordPrivate(TreeNode *node, double lat, double lon)
 {
 	if (root != NULL)
@@ -279,6 +283,43 @@ bool BST::searchCoord(double lon, double lat)
 {
 	return searchCoordPrivate(root, lon, lat);
 }
+*/
+//-----------------------------HEIGHT---------------------------------------------------------
+
+int BST::height()
+{
+	if(isEmpty())
+	{
+		return -1;
+	}
+	else 
+	{
+		return getHeight(root);
+	}
+	
+}
+int BST::getHeight(TreeNode* node)
+{
+	if (node == NULL)
+	{
+		return -1;
+	}
+	int left = getHeight(node->left);
+	int right = getHeight(node->right);
+
+	if (left > right)
+	{
+		return 1 + left;
+		cout << " left is deeper" << endl;
+	}
+	else
+	{
+		return 1 + right;
+		cout << " right is deeper" << endl;
+	}
+}
+//-----------------------------DISTANCE CALC---------------------------------------------------
+
 //-----------------------------DISPLAY---------------------------------------------------------
 //public display
 void BST::display()
@@ -303,12 +344,12 @@ void BST::displayPrivate(TreeNode * node)
 {
 	cout << node->city; //displays the node thats after the root
 	if (node->left != NULL) {
-		cout << "gone left //" << endl;
+		cout << "gone left /// " << endl;
 		displayPrivate(node->left);
 	}
 	if (node->right != NULL)
 	{
-		cout << "gone right \\" << endl;
+		cout << "gone right \\\ " << endl;
 		displayPrivate(node->right);
 	}
 }
@@ -331,13 +372,28 @@ int main() {
 	
 	tree.display();
 	cout << "-----------------------------" << endl;
-	
+	cout << tree.height() << endl;
 	cout << "-----------------------------" << endl;
 	tree.deleteCity("London");
 	tree.display();
 	cout << "-----------------------------" << endl;
 	cout << tree.searchName("Paris") << endl;
-	cout << tree.searchCoord(37.3979, 14.6588) << endl;
-	system("pause");
+	//cout << tree.searchCoord(37.3979, 14.6588) << endl;
+	cout << "-----------------------------" << endl;
+	// tree.Inorder("Dublin");
+	 cout << "-----------------------------" << endl;
+	 cout << "////STARTING ANALYSIS OF ALGORITHMS" << endl;
+	
+	 /*
+	 double wall0 = get_wall_time();
+	 double cpu0 = get_cpu_time();
+	 tree.searchName("London");
+	 double wall1 = get_wall_time();
+	 double cpu1 = get_cpu_time();
+	 cout << "Wall Time = " << wall1 - wall0 << endl;
+	 cout << "CPU Time  = " << cpu1 - cpu0 << endl;
+	
+	*/
+	 system("pause");
 
 };

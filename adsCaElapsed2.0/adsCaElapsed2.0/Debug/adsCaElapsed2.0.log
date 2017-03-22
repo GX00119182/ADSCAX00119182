@@ -1,4 +1,5 @@
 ﻿  BinarySearchTree.cpp
-c:\users\gavin_000\documents\visual studio 2015\projects\adscaelapsed2.0\adscaelapsed2.0\binarysearchtree.cpp(122): warning C4715: 'BST::findSmallestPrivate': not all control paths return a value
+c:\users\gavin_000\documents\visual studio 2015\projects\adscaelapsed2.0\adscaelapsed2.0\binarysearchtree.cpp(265): warning C4800: 'TreeNode *': forcing value to bool 'true' or 'false' (performance warning)
+c:\users\gavin_000\documents\visual studio 2015\projects\adscaelapsed2.0\adscaelapsed2.0\binarysearchtree.cpp(124): warning C4715: 'BST::findSmallestPrivate': not all control paths return a value
   adsCaElapsed2.0.vcxproj -> C:\Users\gavin_000\documents\visual studio 2015\Projects\adsCaElapsed2.0\Debug\adsCaElapsed2.0.exe
   adsCaElapsed2.0.vcxproj -> C:\Users\gavin_000\documents\visual studio 2015\Projects\adsCaElapsed2.0\Debug\adsCaElapsed2.0.pdb (Partial PDB)

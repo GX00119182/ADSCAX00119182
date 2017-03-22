@@ -4,7 +4,7 @@
 #include "City.h"
 #include "TreeNode.h"
 using namespace std;
-
+//MAIN AT BOTTOM OF THIS FILE
 
 class BST {
 	//friend class TreeNode;
@@ -14,20 +14,24 @@ public:
 	~BST();
 	void insert(string name, double lon, double lat);//insert by name, create new obj of city
 	void deleteCity(string name);//delete by name
-	//void deleteNode(TreeNode *node);
-							//missing search method
 	void display();
 	bool isEmpty();
 	int height();
-	
-
+	void Inorder(TreeNode*);
+	void Postorder(TreeNode*);
+	void Preorder(TreeNode* node);
+	bool searchName(string name);
+	bool searchCoord(double lon,double lat);
 private:
 	TreeNode * root;
 	void insertPrivate(TreeNode *newNode, TreeNode *curr);//private insert method to allow for recursion
 	void displayPrivate(TreeNode *newNode);
 	TreeNode* findSmallestPrivate(TreeNode *newNode);
-	void deleteCityPrivate(string name, TreeNode *node);//delete city method allowing access to root
+	void deleteCityPrivate(string name, TreeNode *&node);//delete city method allowing access to root
 	void Remove(TreeNode *&nodeToDel);
+	bool searchNamePrivate(TreeNode *root, string name);
+	bool searchCoordPrivate(TreeNode *node, double lon, double lat);
+
 };
 
 BST::BST()
@@ -105,7 +109,6 @@ TreeNode* BST::findSmallestPrivate(TreeNode *node)
 	if (isEmpty())
 	{
 		cout << "tree is empty" << endl;
-
 	}
 	else
 	{
@@ -115,12 +118,10 @@ TreeNode* BST::findSmallestPrivate(TreeNode *node)
 		}
 		else
 		{
-			return findSmallestPrivate(node);
+			return findSmallestPrivate(node->left);
 		}
 	}
-
 }
-
 void BST::deleteCity(string n)
 {
 	if (!isEmpty())
@@ -128,81 +129,156 @@ void BST::deleteCity(string n)
 		deleteCityPrivate(n, root);
 	}
 }
-
-void BST::deleteCityPrivate(string n, TreeNode *parent)
-{//tutorial 10
-
-		if (n < parent->city.getName())
+void BST::deleteCityPrivate(string n, TreeNode *&parent)
+{
+	if (n < parent->city.getName())
+	{
+		if (parent->left != NULL)
 		{
-			if (parent->left != NULL)
-			{
-				deleteCityPrivate(n, parent->left);
-			}
-			else
-			{
-				cout << n << " not in tree" << endl;
-			}
-		}
-		else if (n > parent->city.getName())
-		{
-			if (parent->right != NULL)
-			{
-				deleteCityPrivate(n, parent->right);
-			}
-			else
-			{
-				cout << n << " not in tree" << endl;
-			}
+			deleteCityPrivate(n, parent->left);
 		}
 		else
 		{
-			Remove(parent);
+			cout << n << " not in tree" << endl;
 		}
-	
+	}
+	else if (n > parent->city.getName())
+	{
+		if (parent->right != NULL)
+		{
+			deleteCityPrivate(n, parent->right);
+		}
+		else
+		{
+			cout << n << " not in tree" << endl;
+		}
+	}
+	else
+	{
+		Remove(parent);
+	}
+
 }
 
-void BST::Remove(TreeNode *&node)
+void BST::Remove(TreeNode *&node)//prepares the node for deletion 
 {
-	
-		TreeNode* temp = new TreeNode;
-		TreeNode* smallestRight; //used delete the smallest node
+	TreeNode *temp = new TreeNode();
+	if (node->right != NULL && node->left != NULL) //
+	{
+		TreeNode* smallest = new TreeNode();
+		smallest = findSmallestPrivate(node->left);
+		string smallestName;
+		smallestName = smallest->city.getName();
+		node->city = smallest->city;
+		deleteCityPrivate(smallestName, node->left);
 
-		 if (node->right == NULL) //if one child left
+	}
+	else
+	{
+		//if only left children
+		if (node->right == NULL && node->left != NULL)//go left
+		{
+			temp = node;//once found node set to temp 
+			node = node->left;
+			delete temp; 
+		}
+		//else if only right children
+		else
 		{
 			temp = node;
-			node = node->left;
+			node = node->right;
 			delete temp;
 		}
+	}
+}
+//----------------------------TRAVERSALS-------------------------------------------------------
 
-		 //if 1 child right
-		 if (node->left == NULL)
-		 {
-			 temp = node;
-			 node = node->right;
-			 delete temp;
-		 }
-
-		/*
-		else if (node->left == NULL && node->right != NULL)
-		{
-			node = node->right;//new root becomes right child
-			delete temp;
-		}
-		else if (node->right == NULL && node->left != NULL)
-		{
-			node = node->left;//new root becomes right child
-			delete temp;
-		}*/
-		//if 2 children
-		else //has 2 children
-		{
-			smallestRight = findSmallestPrivate(node->right);
-			deleteCityPrivate(smallestRight->city.getName(), node);
-			node->city = smallestRight->city;
-		}
-	
+void BST::Preorder(TreeNode* node)
+{
+	if (node)
+	{
+		cout << node->city.getName() << " ";
+		Preorder(node->left);
+		Preorder(node->right);
+	}
 }
 
+void BST::Inorder(TreeNode* root)
+{
+	if (root != NULL)
+	{
+		Inorder(root->left);
+		cout << root->city.getName() << endl;
+		Inorder(root->right);
+
+	}
+}
+
+void BST::Postorder(TreeNode* root)
+{
+	if (root != NULL)
+	{
+
+		Postorder(root->left);
+		Postorder(root->right);
+		cout << root->city.getName() << endl;
+
+	}
+}
+
+//-----------------------------Search---------------------------------------------------------
+/*
+*usage : used/modified
+*author: Newbie25
+*title: Binary search tree search function
+*date: 19/03/17
+*url: http://www.dreamincode.net/forums/topic/173416-binary-search-tree-search-function/
+*/
+bool BST::searchNamePrivate(TreeNode *root,string name)  {
+	if (root != NULL) {
+
+		// check if current node has the element we are looking for
+		if (root->city.getName() == name) {
+			return true;
+			cout << "Found City: " << name << endl;
+		}
+		else {
+			// check if the sub trees
+			return searchNamePrivate(root->left, name) || searchNamePrivate(root->right, name);
+			cout << "Found City: " << name << endl;
+		}
+	}
+	return false;
+	cout << "City: " << name << " not found"<< endl;
+}
+bool BST::searchName(string name)
+{
+	return searchNamePrivate(root, name);
+}
+
+bool BST::searchCoordPrivate(TreeNode *node, double lat, double lon)
+{
+	if (root != NULL)
+	{
+		if (node->city.getLong() == lon && node->city.getLat() == lat)
+		{
+			return node;
+		}
+		else
+		{
+			return searchCoordPrivate(node->left, lat, lon) || searchCoordPrivate(root->right, lat, lon);
+			cout << "Found City: " << node->city.getName() << endl;
+		}
+	}
+	return false;
+	cout << "Co-ordinates not found" << endl;
+
+	
+}
+bool BST::searchCoord(double lon, double lat)
+{
+	return searchCoordPrivate(root, lon, lat);
+}
 //-----------------------------DISPLAY---------------------------------------------------------
 //public display
 void BST::display()
@@ -241,29 +317,27 @@ void BST::displayPrivate(TreeNode * node)
 int main() {
 
 	BST tree;
-	cout << "Enter city name\n";
-	string name;
-	cin >> name;
 
-	cout << "coord 1";
-	double lat;
-	cin >> lat;
-
-	cout << "coord 2";
-	double lon;
-	cin >> lon;
-	cout << "----------------------" << endl;
-	tree.insert(name, lon, lat);
+	tree.insert("Dublin", 53.3498, -6.2603);
+	tree.insert("Manchester", 53.4808, 2.2426);
+	tree.insert("London", 23.2, 34.1);
 	tree.insert("Arizona", 22.2, 14.1);
-	tree.insert("London",23.2,34.1);
-	tree.insert("Paris",89.3,64.2);
+	tree.insert("Edinburgh", 55.9533, -3.1883);
+	tree.insert("Paris", 48.8566, 2.3522);
+	tree.insert("New York", 40.7128, -74.0059);
+	tree.insert("Krakow", 50.0647, 19.9450);
+	tree.insert("Sicily", 37.3979, 14.6588);
+
+	
 	tree.display();
-	cout << "----------------------" << endl;
+	cout << "-----------------------------" << endl;
+	
+	cout << "-----------------------------" << endl;
 	tree.deleteCity("London");
-	
-	
 	tree.display();
-	
+	cout << "-----------------------------" << endl;
+	cout << tree.searchName("Paris") << endl;
+	cout << tree.searchCoord(37.3979, 14.6588) << endl;
 	system("pause");
 
 };
